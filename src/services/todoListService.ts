@@ -1,6 +1,6 @@
 import { Todo } from "../model/todo";
 
-export class TodoListService {
+class TodoListService {
   #todoList: Todo[] = [];
 
   constructor(todoList: Todo[]) {
@@ -19,12 +19,16 @@ export class TodoListService {
     };
 
     this.#todoList = [...this.#todoList, newTodo];
+
+    return newTodo;
   }
 
   updateTodoItem(targetTodo: Todo) {
     this.#todoList = this.#todoList.map((todo) =>
       todo.id === targetTodo.id ? targetTodo : todo
     );
+
+    return { ...targetTodo };
   }
 
   deleteTodoItem(targetId: Todo["id"]) {
@@ -32,8 +36,20 @@ export class TodoListService {
   }
 
   toggleTodoItemComplete(targetId: Todo["id"]) {
+    const targetTodo = this.#todoList.find((todo) => todo.id === targetId);
+
+    if (!targetTodo) return;
+
     this.#todoList = this.#todoList.map((todo) =>
-      todo.id === targetId ? { ...todo, complete: !todo.complete } : todo
+      todo.id === targetTodo.id
+        ? { ...targetTodo, complete: !targetTodo.complete }
+        : todo
     );
+
+    return { ...targetTodo, complete: !targetTodo.complete };
   }
 }
+
+const todoListService = new TodoListService([]);
+
+export default todoListService;
