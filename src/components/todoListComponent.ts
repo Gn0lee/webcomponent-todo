@@ -1,5 +1,3 @@
-import todoListService from "../services/todoListService";
-
 const todoListTemplate = document.createElement("template");
 todoListTemplate.innerHTML = `
     <style>
