@@ -1,7 +1,7 @@
 const todoListTemplate = document.createElement("template");
 todoListTemplate.innerHTML = `
     <style>
-        @import url('./todoListComponent.css')
+      @import url('/components/todoListComponent.css');
     </style>
     <div class="app-component">
         <div class="todo-list-container">

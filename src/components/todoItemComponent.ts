@@ -4,7 +4,7 @@ import todoListService from "../services/todoListService";
 const todoItemTemplate = document.createElement("template");
 todoItemTemplate.innerHTML = `
     <style>
-        @import url('./todoItemComponent.css')
+        @import url('/components/todoItemComponent.css')
     </style>
     <div class="todo-item">
         <input class="todo-check" type="checkbox"/>
