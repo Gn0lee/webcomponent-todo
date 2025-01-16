@@ -43,10 +43,10 @@ export class TodoItemComponent extends HTMLElement {
       ".todo-check"
     ) as HTMLInputElement;
     this.taskInput = this.shadowRoot?.querySelector(
-      ".content-input"
+      ".task-input"
     ) as HTMLInputElement;
     this.taskDisplay = this.shadowRoot?.querySelector(
-      ".content-display"
+      ".task-display"
     ) as HTMLSpanElement;
     this.deleteTodoItemBtn = this.shadowRoot?.querySelector(
       ".delete-todo-item-btn"
