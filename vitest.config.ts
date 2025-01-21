@@ -2,6 +2,12 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    setupFiles: "./src/test/setup.ts",
+    browser: {
+      enabled: true,
+      provider: "playwright",
+      instances: [{ browser: "chromium" }],
+      testerHtmlPath: "./index.html",
+      headless: true,
+    },
   },
 });
