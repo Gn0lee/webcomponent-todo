@@ -27,6 +27,16 @@ export class TodoItemComponent extends HTMLElement {
   deleteTodoItemBtn: HTMLButtonElement;
   todo: Todo;
 
+  private taskDisplayClickHandler = this.turnToEditMode.bind(this);
+
+  private todoItemClickHandler = this.setMouseDownEl.bind(this);
+
+  private documentMouseDownHandler = this.handleClickDocument.bind(this);
+
+  private deleteTodoItemHandler = this.deleteTodo.bind(this);
+
+  private todoCheckChangeHandler = this.toggleComplete.bind(this);
+
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -59,73 +69,33 @@ export class TodoItemComponent extends HTMLElement {
     this.taskInput.value = this.todo.task;
     this.taskDisplay.innerHTML = this.todo.task;
 
-    this.taskDisplay.addEventListener("click", (event) => {
-      event.preventDefault();
+    this.taskDisplay.addEventListener("click", this.taskDisplayClickHandler);
 
-      this.turnToEditMode();
-    });
+    this.todoItem.addEventListener("mousedown", this.todoItemClickHandler);
 
-    this.todoItem.addEventListener("mousedown", (event) => {
-      event.preventDefault();
+    document.addEventListener("mousedown", this.documentMouseDownHandler);
 
-      this.mouseDownEl = event.target as HTMLElement;
-    });
+    this.deleteTodoItemBtn.addEventListener(
+      "click",
+      this.deleteTodoItemHandler
+    );
 
-    document.addEventListener("mousedown", (event) => {
-      event.preventDefault();
-
-      if (this.isClickOutside()) {
-        this.saveTodo();
-      }
-
-      this.mouseDownEl = null;
-    });
-
-    this.deleteTodoItemBtn.addEventListener("click", (event) => {
-      event.preventDefault();
-
-      this.deleteTodo();
-    });
-
-    this.todoCheck.addEventListener("change", (event) => {
-      event.preventDefault();
-
-      this.toggleComplete();
-    });
+    this.todoCheck.addEventListener("change", this.todoCheckChangeHandler);
   }
 
   disconnectedCallback() {
-    this.taskDisplay.removeEventListener("click", (event) => {
-      event.preventDefault();
+    this.taskDisplay.removeEventListener("click", this.taskDisplayClickHandler);
 
-      this.turnToEditMode();
-    });
+    this.todoItem.removeEventListener("mousedown", this.todoItemClickHandler);
 
-    this.todoItem.removeEventListener("mousedown", (event) => {
-      event.preventDefault();
+    document.removeEventListener("mousedown", this.documentMouseDownHandler);
 
-      this.mouseDownEl = event.target as HTMLElement;
-    });
+    this.deleteTodoItemBtn.removeEventListener(
+      "click",
+      this.deleteTodoItemHandler
+    );
 
-    document.removeEventListener("mousedown", (event) => {
-      event.preventDefault();
-
-      if (this.isEditingTodo && this.isClickOutside()) {
-        this.saveTodo();
-      }
-    });
-
-    this.deleteTodoItemBtn.removeEventListener("click", (event) => {
-      event.preventDefault();
-
-      this.deleteTodo();
-    });
-
-    this.todoCheck.removeEventListener("change", (event) => {
-      event.preventDefault();
-
-      this.toggleComplete();
-    });
+    this.todoCheck.removeEventListener("change", this.todoCheckChangeHandler);
   }
 
   isClickOutside() {
@@ -135,7 +105,8 @@ export class TodoItemComponent extends HTMLElement {
     );
   }
 
-  turnToEditMode() {
+  turnToEditMode(event: MouseEvent) {
+    event.preventDefault();
     if (!this.todoCheck.checked) {
       this.isEditingTodo = true;
 
@@ -144,6 +115,11 @@ export class TodoItemComponent extends HTMLElement {
 
       this.taskInput.focus();
     }
+  }
+
+  setMouseDownEl(event: MouseEvent) {
+    event.preventDefault();
+    this.mouseDownEl = event.target as HTMLElement;
   }
 
   saveTodo() {
@@ -160,13 +136,16 @@ export class TodoItemComponent extends HTMLElement {
     this.taskDisplay.innerHTML = this.todo.task;
   }
 
-  deleteTodo() {
+  deleteTodo(event: MouseEvent) {
+    event.preventDefault();
     todoListService.deleteTodoItem(this.todo.id);
 
     this.remove();
   }
 
-  toggleComplete() {
+  toggleComplete(event: Event) {
+    event.preventDefault();
+
     const newTodo = todoListService.toggleTodoItemComplete(this.todo.id);
 
     if (newTodo) {
@@ -179,5 +158,15 @@ export class TodoItemComponent extends HTMLElement {
         this.taskDisplay.classList.remove("strike-through");
       }
     }
+  }
+
+  handleClickDocument(event: MouseEvent) {
+    event.preventDefault();
+
+    if (this.isEditingTodo && this.isClickOutside()) {
+      this.saveTodo();
+    }
+
+    this.mouseDownEl = null;
   }
 }
