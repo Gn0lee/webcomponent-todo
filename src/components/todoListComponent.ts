@@ -18,6 +18,8 @@ export class TodoListComponent extends HTMLElement {
   todoItems: HTMLDivElement;
   addTodoItemButton: HTMLButtonElement;
 
+  private addTodoItemHandler = this.addTodoItem.bind(this);
+
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -34,17 +36,19 @@ export class TodoListComponent extends HTMLElement {
     ) as HTMLButtonElement;
   }
 
+  private addTodoItem() {
+    const newTodoItem = document.createElement("todo-item");
+    this.todoItems.appendChild(newTodoItem);
+  }
+
   connectedCallback() {
-    this.addTodoItemButton.addEventListener("click", () => {
-      const newTodoItem = document.createElement("todo-item");
-      this.todoItems.appendChild(newTodoItem);
-    });
+    this.addTodoItemButton.addEventListener("click", this.addTodoItemHandler);
   }
 
   disconnectedCallback() {
-    this.addTodoItemButton.removeEventListener("click", () => {
-      const newTodoItem = document.createElement("todo-item");
-      this.todoItems.appendChild(newTodoItem);
-    });
+    this.addTodoItemButton.removeEventListener(
+      "click",
+      this.addTodoItemHandler
+    );
   }
 }
