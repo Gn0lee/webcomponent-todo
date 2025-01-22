@@ -148,15 +148,17 @@ export class TodoItemComponent extends HTMLElement {
 
     const newTodo = todoListService.toggleTodoItemComplete(this.todo.id);
 
-    if (newTodo) {
-      this.todo = newTodo;
-      this.todoCheck.checked = newTodo.complete;
+    if (!newTodo) {
+      return;
+    }
 
-      if (newTodo.complete) {
-        this.taskDisplay.classList.add("strike-through");
-      } else {
-        this.taskDisplay.classList.remove("strike-through");
-      }
+    this.todo = newTodo;
+    this.todoCheck.checked = newTodo.complete;
+
+    if (newTodo.complete) {
+      this.taskDisplay.classList.add("strike-through");
+    } else {
+      this.taskDisplay.classList.remove("strike-through");
     }
   }
 
