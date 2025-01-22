@@ -1,3 +1,5 @@
+import { BaseComponent } from "./baseComponent";
+
 const todoListTemplate = document.createElement("template");
 todoListTemplate.innerHTML = `
     <style>
@@ -13,7 +15,7 @@ todoListTemplate.innerHTML = `
     </div>
 `;
 
-export class TodoListComponent extends HTMLElement {
+export class TodoListComponent extends BaseComponent {
   todoListContainer: HTMLDivElement;
   todoItems: HTMLDivElement;
   addTodoItemButton: HTMLButtonElement;
@@ -25,15 +27,15 @@ export class TodoListComponent extends HTMLElement {
     this.attachShadow({ mode: "open" });
     this.shadowRoot?.appendChild(todoListTemplate.content.cloneNode(true));
 
-    this.todoListContainer = this.shadowRoot?.querySelector(
+    this.todoListContainer = this.getShadowElementOrThrow<HTMLDivElement>(
       ".todo-list-container"
-    ) as HTMLDivElement;
-    this.todoItems = this.shadowRoot?.querySelector(
-      ".todo-items"
-    ) as HTMLDivElement;
-    this.addTodoItemButton = this.shadowRoot?.querySelector(
-      ".add-todo-item-btn"
-    ) as HTMLButtonElement;
+    );
+
+    this.todoItems =
+      this.getShadowElementOrThrow<HTMLDivElement>(".todo-items");
+
+    this.addTodoItemButton =
+      this.getShadowElementOrThrow<HTMLButtonElement>(".add-todo-item-btn");
   }
 
   private addTodoItem() {

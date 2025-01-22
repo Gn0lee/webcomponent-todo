@@ -1,5 +1,6 @@
 import { Todo } from "../model/todo";
 import todoListService from "../services/todoListService";
+import { BaseComponent } from "./baseComponent";
 
 const todoItemTemplate = document.createElement("template");
 todoItemTemplate.innerHTML = `
@@ -17,7 +18,7 @@ todoItemTemplate.innerHTML = `
     </div>
 `;
 
-export class TodoItemComponent extends HTMLElement {
+export class TodoItemComponent extends BaseComponent {
   isEditingTodo: boolean;
   mouseDownEl: HTMLElement | null;
   todoItem: HTMLDivElement;
@@ -45,22 +46,20 @@ export class TodoItemComponent extends HTMLElement {
     this.isEditingTodo = false;
     this.mouseDownEl = null;
 
-    this.todoItem = this.shadowRoot?.querySelector(
-      ".todo-item"
-    ) as HTMLDivElement;
+    this.todoItem = this.getShadowElementOrThrow<HTMLDivElement>(".todo-item");
 
-    this.todoCheck = this.shadowRoot?.querySelector(
-      ".todo-check"
-    ) as HTMLInputElement;
-    this.taskInput = this.shadowRoot?.querySelector(
-      ".task-input"
-    ) as HTMLInputElement;
-    this.taskDisplay = this.shadowRoot?.querySelector(
-      ".task-display"
-    ) as HTMLSpanElement;
-    this.deleteTodoItemBtn = this.shadowRoot?.querySelector(
+    this.todoCheck =
+      this.getShadowElementOrThrow<HTMLInputElement>(".todo-check");
+
+    this.taskInput =
+      this.getShadowElementOrThrow<HTMLInputElement>(".task-input");
+
+    this.taskDisplay =
+      this.getShadowElementOrThrow<HTMLSpanElement>(".task-display");
+
+    this.deleteTodoItemBtn = this.getShadowElementOrThrow<HTMLButtonElement>(
       ".delete-todo-item-btn"
-    ) as HTMLButtonElement;
+    );
 
     this.todo = todoListService.addNewTodo();
   }
