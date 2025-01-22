@@ -9,7 +9,7 @@ todoItemTemplate.innerHTML = `
     <div class="todo-item">
         <input class="todo-check" type="checkbox" alt="checkbox"/>
         <div class="todo-task">
-            <input class="task-input" hidden type="text"/>
+            <input class="task-input" hidden type="text" alt="task-input"/>
             <span class="task-display"></span>
         </div>
         <div class="spacer"></div>
