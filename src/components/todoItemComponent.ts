@@ -1,5 +1,6 @@
 import { Todo } from "../model/todo";
 import todoListService from "../services/todoListService";
+import { BaseComponent } from "./baseComponent";
 
 const todoItemTemplate = document.createElement("template");
 todoItemTemplate.innerHTML = `
@@ -7,9 +8,9 @@ todoItemTemplate.innerHTML = `
         @import url('/components/todoItemComponent.css')
     </style>
     <div class="todo-item">
-        <input class="todo-check" type="checkbox"/>
+        <input class="todo-check" type="checkbox" alt="checkbox"/>
         <div class="todo-task">
-            <input class="task-input" hidden type="text"/>
+            <input class="task-input" hidden type="text" alt="task-input"/>
             <span class="task-display"></span>
         </div>
         <div class="spacer"></div>
@@ -17,7 +18,7 @@ todoItemTemplate.innerHTML = `
     </div>
 `;
 
-export class TodoItemComponent extends HTMLElement {
+export class TodoItemComponent extends BaseComponent {
   isEditingTodo: boolean;
   mouseDownEl: HTMLElement | null;
   todoItem: HTMLDivElement;
@@ -27,6 +28,16 @@ export class TodoItemComponent extends HTMLElement {
   deleteTodoItemBtn: HTMLButtonElement;
   todo: Todo;
 
+  private taskDisplayClickHandler = this.turnToEditMode.bind(this);
+
+  private todoItemClickHandler = this.setMouseDownEl.bind(this);
+
+  private documentMouseDownHandler = this.handleClickDocument.bind(this);
+
+  private deleteTodoItemHandler = this.deleteTodo.bind(this);
+
+  private todoCheckChangeHandler = this.toggleComplete.bind(this);
+
   constructor() {
     super();
     this.attachShadow({ mode: "open" });
@@ -35,22 +46,20 @@ export class TodoItemComponent extends HTMLElement {
     this.isEditingTodo = false;
     this.mouseDownEl = null;
 
-    this.todoItem = this.shadowRoot?.querySelector(
-      ".todo-item"
-    ) as HTMLDivElement;
+    this.todoItem = this.getShadowElementOrThrow<HTMLDivElement>(".todo-item");
 
-    this.todoCheck = this.shadowRoot?.querySelector(
-      ".todo-check"
-    ) as HTMLInputElement;
-    this.taskInput = this.shadowRoot?.querySelector(
-      ".task-input"
-    ) as HTMLInputElement;
-    this.taskDisplay = this.shadowRoot?.querySelector(
-      ".task-display"
-    ) as HTMLSpanElement;
-    this.deleteTodoItemBtn = this.shadowRoot?.querySelector(
+    this.todoCheck =
+      this.getShadowElementOrThrow<HTMLInputElement>(".todo-check");
+
+    this.taskInput =
+      this.getShadowElementOrThrow<HTMLInputElement>(".task-input");
+
+    this.taskDisplay =
+      this.getShadowElementOrThrow<HTMLSpanElement>(".task-display");
+
+    this.deleteTodoItemBtn = this.getShadowElementOrThrow<HTMLButtonElement>(
       ".delete-todo-item-btn"
-    ) as HTMLButtonElement;
+    );
 
     this.todo = todoListService.addNewTodo();
   }
@@ -59,73 +68,33 @@ export class TodoItemComponent extends HTMLElement {
     this.taskInput.value = this.todo.task;
     this.taskDisplay.innerHTML = this.todo.task;
 
-    this.taskDisplay.addEventListener("click", (event) => {
-      event.preventDefault();
+    this.taskDisplay.addEventListener("click", this.taskDisplayClickHandler);
 
-      this.turnToEditMode();
-    });
+    this.todoItem.addEventListener("mousedown", this.todoItemClickHandler);
 
-    this.todoItem.addEventListener("mousedown", (event) => {
-      event.preventDefault();
+    document.addEventListener("mousedown", this.documentMouseDownHandler);
 
-      this.mouseDownEl = event.target as HTMLElement;
-    });
+    this.deleteTodoItemBtn.addEventListener(
+      "click",
+      this.deleteTodoItemHandler
+    );
 
-    document.addEventListener("mousedown", (event) => {
-      event.preventDefault();
-
-      if (this.isClickOutside()) {
-        this.saveTodo();
-      }
-
-      this.mouseDownEl = null;
-    });
-
-    this.deleteTodoItemBtn.addEventListener("click", (event) => {
-      event.preventDefault();
-
-      this.deleteTodo();
-    });
-
-    this.todoCheck.addEventListener("change", (event) => {
-      event.preventDefault();
-
-      this.toggleComplete();
-    });
+    this.todoCheck.addEventListener("change", this.todoCheckChangeHandler);
   }
 
   disconnectedCallback() {
-    this.taskDisplay.removeEventListener("click", (event) => {
-      event.preventDefault();
+    this.taskDisplay.removeEventListener("click", this.taskDisplayClickHandler);
 
-      this.turnToEditMode();
-    });
+    this.todoItem.removeEventListener("mousedown", this.todoItemClickHandler);
 
-    this.todoItem.removeEventListener("mousedown", (event) => {
-      event.preventDefault();
+    document.removeEventListener("mousedown", this.documentMouseDownHandler);
 
-      this.mouseDownEl = event.target as HTMLElement;
-    });
+    this.deleteTodoItemBtn.removeEventListener(
+      "click",
+      this.deleteTodoItemHandler
+    );
 
-    document.removeEventListener("mousedown", (event) => {
-      event.preventDefault();
-
-      if (this.isEditingTodo && this.isClickOutside()) {
-        this.saveTodo();
-      }
-    });
-
-    this.deleteTodoItemBtn.removeEventListener("click", (event) => {
-      event.preventDefault();
-
-      this.deleteTodo();
-    });
-
-    this.todoCheck.removeEventListener("change", (event) => {
-      event.preventDefault();
-
-      this.toggleComplete();
-    });
+    this.todoCheck.removeEventListener("change", this.todoCheckChangeHandler);
   }
 
   isClickOutside() {
@@ -135,7 +104,8 @@ export class TodoItemComponent extends HTMLElement {
     );
   }
 
-  turnToEditMode() {
+  turnToEditMode(event: MouseEvent) {
+    event.preventDefault();
     if (!this.todoCheck.checked) {
       this.isEditingTodo = true;
 
@@ -144,6 +114,11 @@ export class TodoItemComponent extends HTMLElement {
 
       this.taskInput.focus();
     }
+  }
+
+  setMouseDownEl(event: MouseEvent) {
+    event.preventDefault();
+    this.mouseDownEl = event.target as HTMLElement;
   }
 
   saveTodo() {
@@ -160,24 +135,39 @@ export class TodoItemComponent extends HTMLElement {
     this.taskDisplay.innerHTML = this.todo.task;
   }
 
-  deleteTodo() {
+  deleteTodo(event: MouseEvent) {
+    event.preventDefault();
     todoListService.deleteTodoItem(this.todo.id);
 
     this.remove();
   }
 
-  toggleComplete() {
+  toggleComplete(event: Event) {
+    event.preventDefault();
+
     const newTodo = todoListService.toggleTodoItemComplete(this.todo.id);
 
-    if (newTodo) {
-      this.todo = newTodo;
-      this.todoCheck.checked = newTodo.complete;
-
-      if (newTodo.complete) {
-        this.taskDisplay.classList.add("strike-through");
-      } else {
-        this.taskDisplay.classList.remove("strike-through");
-      }
+    if (!newTodo) {
+      return;
     }
+
+    this.todo = newTodo;
+    this.todoCheck.checked = newTodo.complete;
+
+    if (newTodo.complete) {
+      this.taskDisplay.classList.add("strike-through");
+    } else {
+      this.taskDisplay.classList.remove("strike-through");
+    }
+  }
+
+  handleClickDocument(event: MouseEvent) {
+    event.preventDefault();
+
+    if (this.isEditingTodo && this.isClickOutside()) {
+      this.saveTodo();
+    }
+
+    this.mouseDownEl = null;
   }
 }
