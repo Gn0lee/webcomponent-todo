@@ -1,9 +1,9 @@
-import { Todo } from "../model/todo";
+import { TodoService } from "./todoService";
 
 class TodoListService {
-  #todoList: Todo[] = [];
+  #todoList: TodoService[] = [];
 
-  constructor(todoList: Todo[]) {
+  constructor(todoList: TodoService[]) {
     this.#todoList = todoList;
   }
 
@@ -12,41 +12,18 @@ class TodoListService {
   }
 
   addNewTodo() {
-    const newTodo: Todo = {
-      id: this.#todoList.length + 1,
-      complete: false,
-      task: `Task ${this.#todoList.length + 1}`,
-    };
-
-    this.#todoList = [...this.#todoList, newTodo];
-
-    return newTodo;
-  }
-
-  updateTodoItem(targetTodo: Todo) {
-    this.#todoList = this.#todoList.map((todo) =>
-      todo.id === targetTodo.id ? targetTodo : todo
+    const newTodoService = new TodoService(
+      this.#todoList.length + 1,
+      `Task ${this.#todoList.length + 1}`
     );
 
-    return { ...targetTodo };
+    this.#todoList = [...this.#todoList, newTodoService];
+
+    return newTodoService;
   }
 
-  deleteTodoItem(targetId: Todo["id"]) {
+  deleteTodoItem(targetId: TodoService["id"]) {
     this.#todoList = this.#todoList.filter((todo) => todo.id !== targetId);
-  }
-
-  toggleTodoItemComplete(targetId: Todo["id"]) {
-    const targetTodo = this.#todoList.find((todo) => todo.id === targetId);
-
-    if (!targetTodo) return;
-
-    this.#todoList = this.#todoList.map((todo) =>
-      todo.id === targetTodo.id
-        ? { ...targetTodo, complete: !targetTodo.complete }
-        : todo
-    );
-
-    return { ...targetTodo, complete: !targetTodo.complete };
   }
 }
 

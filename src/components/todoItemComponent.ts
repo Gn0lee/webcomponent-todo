@@ -1,4 +1,4 @@
-import { Todo } from "../model/todo";
+import { TodoService } from "../services/todoService";
 import todoListService from "../services/todoListService";
 import { CommonComponent } from "../utils/component";
 
@@ -26,7 +26,7 @@ export class TodoItemComponent extends CommonComponent {
   taskInput: HTMLInputElement;
   taskDisplay: HTMLSpanElement;
   deleteTodoItemBtn: HTMLButtonElement;
-  todo: Todo;
+  todo: TodoService;
 
   private taskDisplayClickHandler = this.turnToEditMode.bind(this);
 
@@ -122,10 +122,7 @@ export class TodoItemComponent extends CommonComponent {
   }
 
   saveTodo() {
-    this.todo = todoListService.updateTodoItem({
-      ...this.todo,
-      task: this.taskInput.value,
-    });
+    this.todo.updateTask(this.taskInput.value);
 
     this.isEditingTodo = false;
 
@@ -145,14 +142,9 @@ export class TodoItemComponent extends CommonComponent {
   toggleComplete(event: Event) {
     event.preventDefault();
 
-    const newTodo = todoListService.toggleTodoItemComplete(this.todo.id);
+    this.todo.toggleComplete();
 
-    if (!newTodo) {
-      return;
-    }
-
-    this.todo = newTodo;
-    this.todoCheck.checked = newTodo.complete;
+    this.todoCheck.checked = this.todo.complete;
 
     this.taskDisplay.classList.toggle("strike-through");
   }
