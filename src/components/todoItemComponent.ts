@@ -1,6 +1,6 @@
 import { Todo } from "../model/todo";
 import todoListService from "../services/todoListService";
-import { BaseComponent } from "./baseComponent";
+import { CommonComponent } from "../utils/component";
 
 const todoItemTemplate = document.createElement("template");
 todoItemTemplate.innerHTML = `
@@ -18,7 +18,7 @@ todoItemTemplate.innerHTML = `
     </div>
 `;
 
-export class TodoItemComponent extends BaseComponent {
+export class TodoItemComponent extends CommonComponent {
   isEditingTodo: boolean;
   mouseDownEl: HTMLElement | null;
   todoItem: HTMLDivElement;
