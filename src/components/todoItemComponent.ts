@@ -154,11 +154,7 @@ export class TodoItemComponent extends BaseComponent {
     this.todo = newTodo;
     this.todoCheck.checked = newTodo.complete;
 
-    if (newTodo.complete) {
-      this.taskDisplay.classList.add("strike-through");
-    } else {
-      this.taskDisplay.classList.remove("strike-through");
-    }
+    this.taskDisplay.classList.toggle("strike-through");
   }
 
   handleClickDocument(event: MouseEvent) {
