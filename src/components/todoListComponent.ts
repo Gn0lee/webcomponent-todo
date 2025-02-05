@@ -1,4 +1,5 @@
-import { BaseComponent } from "./baseComponent";
+import { CommonComponent } from "../utils/component";
+import { createNewComponent } from "../utils/constructor";
 
 const todoListTemplate = document.createElement("template");
 todoListTemplate.innerHTML = `
@@ -15,7 +16,7 @@ todoListTemplate.innerHTML = `
     </div>
 `;
 
-export class TodoListComponent extends BaseComponent {
+export class TodoListComponent extends CommonComponent {
   todoListContainer: HTMLDivElement;
   todoItems: HTMLDivElement;
   addTodoItemButton: HTMLButtonElement;
@@ -39,7 +40,7 @@ export class TodoListComponent extends BaseComponent {
   }
 
   private addTodoItem() {
-    const newTodoItem = document.createElement("todo-item");
+    const newTodoItem = createNewComponent("todo-item");
     this.todoItems.appendChild(newTodoItem);
   }
 

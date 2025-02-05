@@ -1,6 +1,6 @@
-import { Todo } from "../model/todo";
+import { TodoService } from "../services/todoService";
 import todoListService from "../services/todoListService";
-import { BaseComponent } from "./baseComponent";
+import { CommonComponent } from "../utils/component";
 
 const todoItemTemplate = document.createElement("template");
 todoItemTemplate.innerHTML = `
@@ -18,7 +18,7 @@ todoItemTemplate.innerHTML = `
     </div>
 `;
 
-export class TodoItemComponent extends BaseComponent {
+export class TodoItemComponent extends CommonComponent {
   isEditingTodo: boolean;
   mouseDownEl: HTMLElement | null;
   todoItem: HTMLDivElement;
@@ -26,7 +26,7 @@ export class TodoItemComponent extends BaseComponent {
   taskInput: HTMLInputElement;
   taskDisplay: HTMLSpanElement;
   deleteTodoItemBtn: HTMLButtonElement;
-  todo: Todo;
+  todo: TodoService;
 
   private taskDisplayClickHandler = this.turnToEditMode.bind(this);
 
@@ -122,10 +122,7 @@ export class TodoItemComponent extends BaseComponent {
   }
 
   saveTodo() {
-    this.todo = todoListService.updateTodoItem({
-      ...this.todo,
-      task: this.taskInput.value,
-    });
+    this.todo.updateTask(this.taskInput.value);
 
     this.isEditingTodo = false;
 
@@ -145,20 +142,11 @@ export class TodoItemComponent extends BaseComponent {
   toggleComplete(event: Event) {
     event.preventDefault();
 
-    const newTodo = todoListService.toggleTodoItemComplete(this.todo.id);
+    this.todo.toggleComplete();
 
-    if (!newTodo) {
-      return;
-    }
+    this.todoCheck.checked = this.todo.complete;
 
-    this.todo = newTodo;
-    this.todoCheck.checked = newTodo.complete;
-
-    if (newTodo.complete) {
-      this.taskDisplay.classList.add("strike-through");
-    } else {
-      this.taskDisplay.classList.remove("strike-through");
-    }
+    this.taskDisplay.classList.toggle("strike-through");
   }
 
   handleClickDocument(event: MouseEvent) {

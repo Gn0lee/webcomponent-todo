@@ -1,4 +1,4 @@
-export class BaseComponent extends HTMLElement {
+export class CommonComponent extends HTMLElement {
   /**
    * Shadow DOM에서 특정 셀렉터로 요소를 가져오는 메서드.
    * @param selector - CSS 셀렉터 문자열
