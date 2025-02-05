@@ -19,4 +19,8 @@ const defineAllComponents = () => {
   });
 };
 
-export { defineAllComponents };
+const createNewComponent = (name: keyof typeof ComponentEntries) => {
+  return document.createElement(name);
+}
+
+export { defineAllComponents, createNewComponent };

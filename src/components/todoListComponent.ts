@@ -1,4 +1,5 @@
 import { CommonComponent } from "../utils/component";
+import { createNewComponent } from "../utils/constructor";
 
 const todoListTemplate = document.createElement("template");
 todoListTemplate.innerHTML = `
@@ -39,7 +40,7 @@ export class TodoListComponent extends CommonComponent {
   }
 
   private addTodoItem() {
-    const newTodoItem = document.createElement("todo-item");
+    const newTodoItem = createNewComponent("todo-item");
     this.todoItems.appendChild(newTodoItem);
   }
 
